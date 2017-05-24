@@ -1,4 +1,4 @@
-package com.everhomes.unittool;
+package com.everhomes.ideaplugin.util;
 
 import com.intellij.ide.IdeView;
 import com.intellij.ide.util.*;
@@ -23,11 +23,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Field;
 
-/**
- * Desc:
- * Mail: hehaiyang@terminus.io
- * Date: 2017/4/6
- */
 public class PsiUtil {
 
     /**
@@ -123,9 +118,9 @@ public class PsiUtil {
         DirectoryChooser chooser = createDirectoryChooserWithoutNeighborClasses(project);
         chooser.showAndGet();
 
-//        DirectoryChooser directoryChooser = createDirectoryChooserWithoutNeighborClasses(project);
-//        directoryChooser.fillList(directories, initialDir, project, "");
-//        directoryChooser.showAndGet();
+       // DirectoryChooser directoryChooser = createDirectoryChooserWithoutNeighborClasses(project);
+       // directoryChooser.fillList(directories, initialDir, project, "");
+       // directoryChooser.showAndGet();
         return chooser.getSelectedDirectory();
     }
 

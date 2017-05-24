@@ -1,18 +1,29 @@
-package com.everhomes.unittool;
+package com.everhomes.ideaplugin.unittool.ui;
 
-import com.intellij.openapi.ui.Messages;
+import com.everhomes.ideaplugin.util.PsiUtil;
+import com.everhomes.ideaplugin.util.Util;
+import com.intellij.openapi.project.Project;
+import com.intellij.psi.PsiClass;
+import com.intellij.psi.PsiDirectory;
 
 import javax.swing.*;
-import java.awt.*;
 import java.awt.event.*;
 
-public class GenUnitMethodDialog extends JDialog {
+public class UnitToolDialog extends JDialog {
+
+    private final int INIT_W = 600; //窗体初始宽度
+    private final int INIT_H = 460; //窗体初始高度
+
     private JPanel contentPane;
     private JButton buttonOK;
     private JButton buttonCancel;
-    private JTextField textField1;
+    private JButton button1;
+    private JButton button2;
+    private JButton button3;
 
-    public GenUnitMethodDialog() {
+    Project project;
+
+    public UnitToolDialog() {
         setContentPane(contentPane);
         setModal(true);
         getRootPane().setDefaultButton(buttonOK);
@@ -20,6 +31,12 @@ public class GenUnitMethodDialog extends JDialog {
         buttonOK.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 onOK();
+            }
+        });
+
+        button1.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                onButton1();
             }
         });
 
@@ -43,22 +60,21 @@ public class GenUnitMethodDialog extends JDialog {
                 onCancel();
             }
         }, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+
+
+        setLocationRelativeTo(null);
+    }
+
+    private void onButton1() {
+        PsiClass psiClass = Util.chooseClass(project, null);
+    }
+
+    private void onButton2() {
+        PsiDirectory psiClass = PsiUtil.chooseDirectory(project);
     }
 
     private void onOK() {
         // add your code here
-        Insets insets = textField1.getInsets();
-        String text = textField1.getText();
-        Messages.showMessageDialog(
-                text,
-                "GetText",
-                Messages.getInformationIcon()
-        );
-        Messages.showMessageDialog(
-                insets.toString(),
-                "insets",
-                Messages.getInformationIcon()
-        );
         dispose();
     }
 
@@ -68,13 +84,9 @@ public class GenUnitMethodDialog extends JDialog {
     }
 
     public static void main(String[] args) {
-        GenUnitMethodDialog dialog = new GenUnitMethodDialog();
+        UnitToolDialog dialog = new UnitToolDialog();
         dialog.pack();
         dialog.setVisible(true);
         System.exit(0);
-    }
-
-    private void createUIComponents() {
-        // TODO: place custom component creation code here
     }
 }

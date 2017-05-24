@@ -28,14 +28,20 @@
 
   <extensions defaultExtensionNs="com.intellij">
     <!-- Add your extensions here -->
-      <applicationService serviceInterface="com.everhomes.unittool.config.EhUnitToolSettings"
-                          serviceImplementation="com.everhomes.unittool.config.EhUnitToolSettings"/>
+      <applicationService serviceInterface="com.everhomes.ideaplugin.config.IdeaToolsSetting"
+                          serviceImplementation="com.everhomes.ideaplugin.config.IdeaToolsSetting"/>
   </extensions>
 
   <actions>
     <!-- Add your actions here -->
-      <action id="ehunittool.GenUnitMethod" class="com.everhomes.unittool.GenUnitMethod" text="GenUnitMethod">
-          <add-to-group group-id="EditorPopupMenu" anchor="first"/>
+      <action id="ideaplugin.UnitTool" class="com.everhomes.ideaplugin.unittool.UnitToolAction" text="UnitTool">
+          <add-to-group group-id="EditorPopupMenu" anchor="last"/>
+      </action>
+      <action id="ideaplugin.DocComment" class="com.everhomes.ideaplugin.doccomment.DocCommentAction" text="DocComment">
+          <add-to-group group-id="GenerateGroup" anchor="last"/>
+      </action>
+      <action id="ideaplugin.RestAPI" class="com.everhomes.ideaplugin.restapi.RestAPIAction" text="RestAPI">
+          <add-to-group group-id="EditorPopupMenu" anchor="last"/>
       </action>
   </actions>
 

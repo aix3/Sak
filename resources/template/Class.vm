@@ -1,7 +1,38 @@
-package com.everhomes.unittool;
+// @formatter:off
+package ${packageName};
 
-import java.util.List;
+import com.everhomes.test.core.base.BaseLoginAuthTestCase;
+import com.everhomes.util.StringHelper;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
-public class FlowTest implements List {
+public class ${testClassName} extends BaseLoginAuthTestCase {
 
+    private String userIdentifier = "9201000";
+    private String plainTextPwd = "123456";
+
+    private void logon() {
+        logon(namespaceId, userIdentifier, plainTextPwd);
+    }
+
+    @Before public void setUp() {
+        super.newSetUp();
+        logon();
+    }
+
+    @Override protected void initCustomData() {
+        // String jsonFilePath = "data/json/3.4.x-test-data-zuolin_admin_user_160607.txt";
+        // String fileAbsolutePath = dbProvider.getAbsolutePathFromClassPath(jsonFilePath);
+        // dbProvider.loadJsonFileToDatabase(fileAbsolutePath, false);
+
+        // jsonFilePath = "data/json/organizationfile-1.0-test-data-170217.json";
+        // fileAbsolutePath = dbProvider.getAbsolutePathFromClassPath(jsonFilePath);
+        // dbProvider.loadJsonFileToDatabase(fileAbsolutePath, false);
+    }
+
+    @After public void tearDown() {
+        super.tearDown();
+        logoff();
+    }
 }

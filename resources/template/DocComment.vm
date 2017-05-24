@@ -1,0 +1,7 @@
+/**
+ * <ul>
+#foreach($field in $entries)
+ *     <li>$field.name: $field.desc</li>
+#end
+ * </ul>
+ */

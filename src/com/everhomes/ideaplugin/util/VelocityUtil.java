@@ -1,4 +1,4 @@
-package com.everhomes.unittool.util;
+package com.everhomes.ideaplugin.util;
 
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.VelocityEngine;
@@ -8,10 +8,6 @@ import org.apache.velocity.runtime.log.NullLogChute;
 import java.io.StringWriter;
 import java.util.Map;
 
-/**
- * @author hansong.xhs
- * @version $Id: VelocityUtil.java, v 0.1 2017-01-22 8:49 hansong.xhs Exp $$
- */
 public class VelocityUtil {
 
     private final static VelocityEngine velocityEngine;
@@ -20,7 +16,7 @@ public class VelocityUtil {
         velocityEngine = new VelocityEngine();
         // Disable separate Velocity logging.
         velocityEngine.setProperty(RuntimeConstants.RUNTIME_LOG_LOGSYSTEM_CLASS,
-            NullLogChute.class.getName());
+                NullLogChute.class.getName());
         velocityEngine.init();
     }
 
@@ -31,5 +27,4 @@ public class VelocityUtil {
         velocityEngine.evaluate(context, writer, "", template);
         return writer.toString();
     }
-
 }

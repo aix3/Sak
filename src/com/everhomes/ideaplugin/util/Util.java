@@ -1,10 +1,12 @@
-package com.everhomes.unittool.util;
+package com.everhomes.ideaplugin.util;
 
 import com.google.common.collect.Lists;
 import com.intellij.ide.util.TreeClassChooser;
 import com.intellij.ide.util.TreeClassChooserFactory;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.wm.WindowManager;
+import com.intellij.openapi.wm.ex.StatusBarEx;
 import com.intellij.psi.*;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.search.GlobalSearchScopeUtil;
@@ -16,11 +18,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-/**
- * @author hansong.xhs
- * @version $Id: CodeMakerUtil.java, v 0.1 2017-01-20 10:15 hansong.xhs Exp $$
- */
-public class CodeMakerUtil {
+public class Util {
 
     public static Logger getLogger(Class clazz) {
         return Logger.getInstance(clazz);
@@ -51,48 +49,6 @@ public class CodeMakerUtil {
         }
         return Arrays.stream(importList.getImportStatements())
                 .map(PsiImportStatement::getQualifiedName).collect(Collectors.toList());
-    }
-
-    public static List<ClassEntry.Field> getFields(PsiClass psiClass) {
-        return Arrays
-                .stream(psiClass.getFields())
-                .map(
-                        psiField -> new ClassEntry.Field(psiField.getType().getPresentableText(), psiField
-                                .getName(), psiField.getModifierList() == null ? "" : psiField
-                                .getModifierList().getText())).collect(Collectors.toList());
-    }
-
-    public static List<ClassEntry.Field> getAllFields(PsiClass psiClass) {
-        return Arrays
-                .stream(psiClass.getAllFields())
-                .map(
-                        psiField -> new ClassEntry.Field(psiField.getType().getPresentableText(), psiField
-                                .getName(), psiField.getModifierList() == null ? "" : psiField
-                                .getModifierList().getText())).collect(Collectors.toList());
-    }
-
-    public static List<ClassEntry.Method> getMethods(PsiClass psiClass) {
-        return Arrays
-                .stream(psiClass.getMethods())
-                .map(
-                        psiMethod -> {
-                            String returnType = psiMethod.getReturnType() == null ? "" : psiMethod
-                                    .getReturnType().getPresentableText();
-                            return new ClassEntry.Method(psiMethod.getName(), psiMethod.getModifierList()
-                                    .getText(), returnType, psiMethod.getParameterList().getText());
-                        }).collect(Collectors.toList());
-    }
-
-    public static List<ClassEntry.Method> getAllMethods(PsiClass psiClass) {
-        return Arrays
-                .stream(psiClass.getAllMethods())
-                .map(
-                        psiMethod -> {
-                            String returnType = psiMethod.getReturnType() == null ? "" : psiMethod
-                                    .getReturnType().getPresentableText();
-                            return new ClassEntry.Method(psiMethod.getName(), psiMethod.getModifierList()
-                                    .getText(), returnType, psiMethod.getParameterList().getText());
-                        }).collect(Collectors.toList());
     }
 
     /**
@@ -128,6 +84,15 @@ public class CodeMakerUtil {
         GlobalSearchScope searchScope =
                 GlobalSearchScopeUtil.toGlobalSearchScope(new ProjectAndLibrariesScope(project), project);
         return JavaPsiFacade.getInstance(project).findClass(qName, searchScope);
+    }
+
+    public static void setStatusBarText(Project project, String message) {
+        if (project != null) {
+            final StatusBarEx statusBar = (StatusBarEx) WindowManager.getInstance().getStatusBar(project);
+            if (statusBar != null) {
+                statusBar.setInfo(message);
+            }
+        }
     }
 
     public static boolean isNumeric(String str) {

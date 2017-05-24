@@ -1,4 +1,4 @@
-package com.everhomes.unittool.config;
+package com.everhomes.ideaplugin.config;
 
 import com.intellij.openapi.components.PersistentStateComponent;
 import com.intellij.openapi.components.State;
@@ -14,14 +14,14 @@ import java.util.Map;
 /**
  * Created by xq.tian on 2017/5/22.
  */
-@State(name = "EhUnitToolSettings", storages = {@Storage(id = "app-default", file = "$APP_CONFIG$/EhUnitTool-settings.xml")})
-public class EhUnitToolSettings implements PersistentStateComponent<EhUnitToolSettings> {
+@State(name = "IdeaToolsSetting", storages = {@Storage(id = "app-default", file = "$APP_CONFIG$/IdeaTools-settings.xml")})
+public class IdeaToolsSetting implements PersistentStateComponent<IdeaToolsSetting> {
 
-    private static final Logger LOGGER = Logger.getInstance(EhUnitToolSettings.class);
+    private static final Logger LOGGER = Logger.getInstance(IdeaToolsSetting.class);
 
     private Map<String, String> codeTemplates;
 
-    public EhUnitToolSettings() {
+    public IdeaToolsSetting() {
     }
 
     public Map<String, String> getCodeTemplates() {
@@ -33,7 +33,7 @@ public class EhUnitToolSettings implements PersistentStateComponent<EhUnitToolSe
 
     @Nullable
     @Override
-    public EhUnitToolSettings getState() {
+    public IdeaToolsSetting getState() {
         if (this.codeTemplates == null) {
             loadDefaultSettings();
         }
@@ -42,13 +42,17 @@ public class EhUnitToolSettings implements PersistentStateComponent<EhUnitToolSe
 
     private void loadDefaultSettings() {
         try {
-            String classVm = FileUtil.loadTextAndClose(EhUnitToolSettings.class.getResourceAsStream("/template/Class.vm"));
-            String methodVm = FileUtil.loadTextAndClose(EhUnitToolSettings.class.getResourceAsStream("/template/Method.vm"));
-            String constVm = FileUtil.loadTextAndClose(EhUnitToolSettings.class.getResourceAsStream("/template/Const.vm"));
+            String classVm = FileUtil.loadTextAndClose(IdeaToolsSetting.class.getResourceAsStream("/template/Class.vm"));
+            String methodVm = FileUtil.loadTextAndClose(IdeaToolsSetting.class.getResourceAsStream("/template/Method.vm"));
+            String constVm = FileUtil.loadTextAndClose(IdeaToolsSetting.class.getResourceAsStream("/template/Const.vm"));
+            String restDocCommentVm = FileUtil.loadTextAndClose(IdeaToolsSetting.class.getResourceAsStream("/template/DocComment.vm"));
+            String restAPIVm = FileUtil.loadTextAndClose(IdeaToolsSetting.class.getResourceAsStream("/template/RestAPI.vm"));
             Map<String, String> codeTemplates = new HashMap<>();
             codeTemplates.put("Class", classVm);
             codeTemplates.put("Method", methodVm);
             codeTemplates.put("Const", constVm);
+            codeTemplates.put("DocComment", restDocCommentVm);
+            codeTemplates.put("RestAPI", restAPIVm);
             this.codeTemplates = codeTemplates;
         } catch (Exception e) {
             LOGGER.error("loadDefaultSettings failed", e);
@@ -56,8 +60,8 @@ public class EhUnitToolSettings implements PersistentStateComponent<EhUnitToolSe
     }
 
     @Override
-    public void loadState(EhUnitToolSettings ehUnitToolSettings) {
-        XmlSerializerUtil.copyBean(ehUnitToolSettings, this);
+    public void loadState(IdeaToolsSetting ideaToolsSetting) {
+        XmlSerializerUtil.copyBean(ideaToolsSetting, this);
     }
 
     public String getTemplate(String key) {
