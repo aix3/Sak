@@ -11,7 +11,6 @@ import com.intellij.openapi.ide.CopyPasteManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.*;
 import com.intellij.psi.impl.source.PsiTypeElementImpl;
-import com.intellij.psi.impl.source.tree.java.PsiLiteralExpressionImpl;
 import com.intellij.psi.javadoc.PsiDocComment;
 import com.intellij.util.ui.TextTransferable;
 import org.jetbrains.annotations.NotNull;
@@ -30,10 +29,10 @@ class RestAPIService {
     private static final Logger log = Util.getLogger(RestAPIService.class);
 
     private static final String JAVA_UTIL_LIST_REGEX = "java\\.util\\.List<(.*?)>";
-    private static final String REQUEST_MAPPING_REGEX = "@SuppressWarnings\\(\"(.*?)\"\\)";
+    private static final String REQUEST_MAPPING_REGEX = "@RequestMapping\\(\"(.*?)\"\\)";
     private static final String FIELD_COMMENT_REGEX = "<li>(.*?)[：:](.*?)</li>";
 
-    private static final String REQUEST_MAPPING_ANNO = "@SuppressWarnings";
+    private static final String REQUEST_MAPPING_ANNO = "@RequestMapping";
     private Project project;
     private PsiMethod currMethod;
     private IdeaToolsSetting settings;
@@ -48,11 +47,11 @@ class RestAPIService {
     private String genRestAPI(PsiClass psiClass, PsiElement element) {
         String qualifiedName = psiClass.getQualifiedName();
         if (qualifiedName == null) {
-            return "Do not find psiClass qualifiedName!";
+            return "Not find psiClass qualifiedName";
         }
 
         if (!qualifiedName.endsWith("Controller")) {
-            return "Please choose a controller!";
+            return "Please in controller method";
         }
 
         String clzBody = psiClass.getText();
@@ -61,7 +60,7 @@ class RestAPIService {
         currMethod = this.getCurrentMethod(psiClass, element);
 
         if (currMethod == null) {
-            return "Please choose a method in controller!";
+            return "Please in controller method";
         }
 
         String methodBody = currMethod.getText();
@@ -91,7 +90,7 @@ class RestAPIService {
 
         CopyPasteManager.getInstance().setContents(new TextTransferable(content));
 
-        Util.setStatusBarText(project, "RestAPI has been copied in clipboard");
+        Util.setStatusBarText(project, "API has been copied in clipboard");
         return "OK";
     }
 
@@ -127,11 +126,12 @@ class RestAPIService {
                 PsiAnnotationMemberValue value = annotation.findAttributeValue("value");
                 PsiAnnotationMemberValue collection = annotation.findAttributeValue("collection");
                 String respQName = ((PsiTypeElementImpl) value.getFirstChild()).getType().getCanonicalText();
-                String collectionFlag = ((PsiLiteralExpressionImpl) collection).getCanonicalText();
+                String collectionFlag = collection.getText();
                 entry.setRespQName(respQName);
                 if (collectionFlag != null) {
                     entry.setRespCollectionFlag(Boolean.valueOf(collectionFlag));
                 }
+                break;
             }
         }
         return entry;
@@ -175,23 +175,12 @@ class RestAPIService {
                 entry.setFieldName(field.getText());
             }
 
-            String fieldDesc = commentMap.get(field.getName());
-            if (fieldDesc == null) {
-                fieldDesc = commentMap.get(field.getText());
-            }
-            if (fieldDesc == null) {
-                fieldDesc = commentMap.get(field.getText().replace("(byte)", ""));
-            }
-            if (fieldDesc == null) {
-                fieldDesc = commentMap.get(field.getText().replace("\"", ""));
-            }
-
-            String finalFieldDesc = (fieldDesc != null && fieldDesc.trim().length() > 0) ? fieldDesc : field.getName();
+            String fieldDesc = getFieldDesc(commentMap, field);
 
             String fieldQualifiedName = field.getType().getCanonicalText();
             if (fieldQualifiedName.startsWith("com.everhomes.rest")) {
-                if (!isEnum && !finalFieldDesc.contains("@link")) {
-                    finalFieldDesc += String.format("{@link %s}", fieldQualifiedName);
+                if (!isEnum && !fieldDesc.contains("@link")) {
+                    fieldDesc += String.format("%s {@link %s}", field.getName(), fieldQualifiedName);
                 }
                 entry.setLink(true);
                 PsiClass fieldClass = Util.getClassByQName(project, fieldQualifiedName);
@@ -204,8 +193,8 @@ class RestAPIService {
                 if (matcher.find()) {
                     String group = matcher.group(1);
                     if (group.startsWith("com.everhomes.rest")) {
-                        if (!finalFieldDesc.contains("@link")) {
-                            finalFieldDesc += String.format("{@link %s}", group);
+                        if (!fieldDesc.contains("@link")) {
+                            fieldDesc += String.format("%s {@link %s}", field.getName(), group);
                         }
                         entry.setLink(true);
                         PsiClass fieldClass = Util.getClassByQName(project, group);
@@ -224,10 +213,25 @@ class RestAPIService {
                     }
                 }
             }
-            entry.setFieldDesc(finalFieldDesc);
+            entry.setFieldDesc(fieldDesc);
             entryList.add(entry);
         }
         return entryList;
+    }
+
+    private String getFieldDesc(Map<String, String> commentMap, PsiField field) {
+        String fieldDesc = commentMap.get(field.getName());
+        if (fieldDesc == null) {
+            fieldDesc = commentMap.get(field.getText());
+        }
+        if (fieldDesc == null) {
+            fieldDesc = commentMap.get(field.getText().replaceAll("\\(byte\\)", ""));
+        }
+        if (fieldDesc == null) {
+            fieldDesc = commentMap.get(field.getText().replaceAll("\"", ""));
+        }
+        fieldDesc = (fieldDesc != null && fieldDesc.trim().length() > 0) ? fieldDesc : field.getName();
+        return fieldDesc;
     }
 
     private static RestAPIService getInstance() {

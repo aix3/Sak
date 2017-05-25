@@ -34,13 +34,13 @@
 
   <actions>
     <!-- Add your actions here -->
-      <action id="ideaplugin.UnitTool" class="com.everhomes.ideaplugin.unittool.UnitToolAction" text="UnitTool">
+      <action id="ideaplugin.GenUnit" class="com.everhomes.ideaplugin.unittool.UnitToolAction" text="GenUnit">
           <add-to-group group-id="EditorPopupMenu" anchor="last"/>
       </action>
       <action id="ideaplugin.DocComment" class="com.everhomes.ideaplugin.doccomment.DocCommentAction" text="DocComment">
           <add-to-group group-id="GenerateGroup" anchor="last"/>
       </action>
-      <action id="ideaplugin.RestAPI" class="com.everhomes.ideaplugin.restapi.RestAPIAction" text="RestAPI">
+      <action id="ideaplugin.CopyAPI" class="com.everhomes.ideaplugin.restapi.RestAPIAction" text="CopyAPI">
           <add-to-group group-id="EditorPopupMenu" anchor="last"/>
       </action>
   </actions>

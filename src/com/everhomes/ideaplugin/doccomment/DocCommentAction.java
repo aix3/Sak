@@ -24,6 +24,7 @@ public class DocCommentAction extends AnAction {
         PsiClass psiClass = PsiUtil.getPsiClass(e);
         if (psiClass == null) {
             errDialog("Do not find class");
+            return;
         }
 
         String result = DocCommentService.genRestDocComment(psiClass, settings);

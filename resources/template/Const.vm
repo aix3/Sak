@@ -1,1 +1,2 @@
+// $testComment
 private static final String ${requestUriName} = "${requestUri}";

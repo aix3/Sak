@@ -1,6 +1,7 @@
 package com.everhomes.ideaplugin.unittool;
 
 import com.everhomes.ideaplugin.unittool.bean.CmdEntry;
+import com.everhomes.ideaplugin.util.Util;
 
 import java.util.List;
 
@@ -36,12 +37,8 @@ public class CmdEntryRender {
         if (objName.endsWith("List")) {
             sb.append(objName).append(".add(").append(setter.getValue()).append(");");
         } else {
-            sb.append(objName).append(".set").append(cap(setter.getName())).append("(").append(setter.getValue()).append(");");
+            sb.append(objName).append(".set").append(Util.cap(setter.getName())).append("(").append(setter.getValue()).append(");");
         }
         return sb.toString();
-    }
-
-    private String cap(String str) {
-        return str.substring(0, 1).toUpperCase() + str.substring(1);
     }
 }

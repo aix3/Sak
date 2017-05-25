@@ -31,11 +31,13 @@ public class UnitToolAction extends AnAction implements DumbAware {
         PsiClass psiClass = PsiUtil.getPsiClass(e);
         if (psiClass == null) {
             errDialog("Do not find class");
+            return;
         }
 
         PsiElement element = PsiUtil.getCurrentElement(e);
         if (element == null) {
             errDialog("Do not find element");
+            return;
         }
 
         String result = UnitToolService.genUnitTest(psiClass, element, settings);

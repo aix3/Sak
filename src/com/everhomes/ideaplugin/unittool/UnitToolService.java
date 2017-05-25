@@ -16,6 +16,8 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VirtualFileManager;
 import com.intellij.psi.*;
 import com.intellij.psi.codeStyle.CodeStyleManager;
+import com.intellij.psi.impl.source.PsiTypeElementImpl;
+import com.intellij.psi.javadoc.PsiDocComment;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -32,18 +34,19 @@ class UnitToolService {
 
     private static final Logger log = Util.getLogger(UnitToolService.class);
 
-    private static final String REQUEST_MAPPING_ANNO = "@SuppressWarnings";
+    private static final String REQUEST_MAPPING_ANNO = "@RequestMapping";
 
     private static final String JAVA_UTIL_LIST_REGEX = "java\\.util\\.List<(.*?)>";
-    private static final String REQUEST_MAPPING_REGEX = "@SuppressWarnings\\(\"(.*?)\"\\)";
+    private static final String REQUEST_MAPPING_REGEX = "@RequestMapping\\(\"(.*?)\"\\)";
 
     private List<String> importList = Lists.newArrayList();
     private Project project;
-    private String currClzName;
     private PsiMethod currMethod;
-    private String dirPath = "src/com/everhomes/unittool";
-    private String packageName = "com.everhomes.test.junit";
+    private String dirPath = "ehtest-integration/src/test/java/";
+    private String basePackageName = "com.everhomes.test.junit";
     private PsiClass testClz;
+    private boolean responseString = false;
+    private String testComment;
 
     private PsiJavaFile testJavaFile;
     private IdeaToolsSetting settings;
@@ -59,13 +62,13 @@ class UnitToolService {
     }
 
     private String generateUnitTest(PsiClass psiClass, PsiElement element) {
-        String qualifiedName = psiClass.getQualifiedName();
-        if (qualifiedName == null) {
-            return "Do not find psiClass qualifiedName!";
+        String currClzQName = psiClass.getQualifiedName();
+        if (currClzQName == null) {
+            return "Not find psiClass qualifiedName";
         }
 
-        if (!qualifiedName.endsWith("Controller")) {
-            return "Please choose a controller!";
+        if (!currClzQName.endsWith("Controller")) {
+            return "Please in a controller method";
         }
 
         String clzBody = psiClass.getText();
@@ -74,7 +77,7 @@ class UnitToolService {
         currMethod = this.getCurrentMethod(psiClass, element);
 
         if (currMethod == null) {
-            return "Please choose a method in controller!";
+            return "Please in a controller method";
         }
 
         String methodBody = currMethod.getText();
@@ -85,10 +88,16 @@ class UnitToolService {
 
         final List<String> cmdList = getCmdList(currMethod);
 
-        project = psiClass.getProject();
-        currClzName = psiClass.getName();
+        processTestComment();
+        this.responseString = processResponseType();
+        if (responseString) {
+            importList.add("com.everhomes.rest.RestResponseBase");
+        }
 
-        final String testClassName = currClzName.substring(0, currClzName.indexOf("Controller")) + "Test";
+        project = psiClass.getProject();
+
+        final String testQClassName = basePackageName +
+                currClzQName.substring(13, currClzQName.indexOf("Controller")) + "Test";
 
         // PsiClass selectedClass = Util.chooseClass(project, psiClass);
         //
@@ -106,34 +115,38 @@ class UnitToolService {
 
         WriteCommandAction.runWriteCommandAction(project, () -> {
 
-            getOrCreateTestClass(testClassName);
+            getOrCreateTestClass(testQClassName);
 
             PsiElementFactory factory = JavaPsiFacade.getElementFactory(project);
 
-            processImportList(factory);
-
             Map<String, Object> map = Maps.newHashMap();
+            map.put("testComment", testComment);
             map.put("requestUriName", currMethod.getName() + "URL");
             map.put("requestUri", requestMapping);
             String template = settings.getTemplate("Const");
             String content = VelocityUtil.evaluate(template, map);
-            // content = content.replaceAll("\\s\\s+", "");
 
             PsiField field = factory.createFieldFromText(content, testClz);
 
             map = Maps.newHashMap();
+            map.put("responseString", responseString);
+            map.put("testComment", testComment);
             map.put("methodName", currMethod.getName());
             map.put("requestUriName", currMethod.getName() + "URL");
             map.put("setterBlock", entryList);
             map.put("render", new CmdEntryRender());
             template = settings.getTemplate("Method");
             content = VelocityUtil.evaluate(template, map);
-            // content = content.replaceAll("\\s\\s+", "");
 
             PsiMethod method = factory.createMethodFromText(content, testClz);
 
             testClz.add(field);
             testClz.addBefore(method, testClz.getMethods()[0]);
+
+            String responseClass = "com.everhomes.rest" + currClzQName.substring(13, currClzQName.lastIndexOf(".")+1) + Util.cap(currMethod.getName()) + "RestResponse";
+            importList.add(responseClass);
+
+            processImportList(factory);
 
             CodeStyleManager.getInstance(project).reformat(testClz);
 
@@ -144,36 +157,63 @@ class UnitToolService {
         return "OK";
     }
 
-    private void processImportList(PsiElementFactory factory) {
-        for (String im : importList) {
-            PsiClass classByQName = Util.getClassByQName(project, im);
-            PsiImportStatement importStatement = factory.createImportStatement(classByQName);
-            List<String> stringList = Util.getImportList(testJavaFile);
-            if (!stringList.contains(im)) {
-                testJavaFile.getImportList().add(importStatement);
+    private boolean processResponseType() {
+        PsiAnnotation annotation = currMethod.getModifierList().findAnnotation("com.everhomes.discover.RestReturn");
+        if (annotation != null) {
+            PsiAnnotationMemberValue value = annotation.findAttributeValue("value");
+            String respQName = ((PsiTypeElementImpl) value.getFirstChild()).getType().getCanonicalText();
+            return "java.lang.String".equals(respQName);
+        }
+        return false;
+    }
+
+    private void processTestComment() {
+        PsiDocComment docComment = currMethod.getDocComment();
+        if (docComment != null) {
+            String text = docComment.getText();
+            Pattern compile = Pattern.compile("<p>(.*?)</p>");
+            Matcher matcher = compile.matcher(text);
+            if (matcher.find()) {
+                this.testComment = matcher.group(1);
+            } else {
+                this.testComment = "";
             }
         }
     }
 
-    private void getOrCreateTestClass(String testClassName) {
+    private void processImportList(PsiElementFactory factory) {
+        for (String im : importList) {
+            PsiClass classByQName = Util.getClassByQName(project, im);
+            if (classByQName != null) {
+                PsiImportStatement importStatement = factory.createImportStatement(classByQName);
+                List<String> stringList = Util.getImportList(testJavaFile);
+                if (!stringList.contains(im)) {
+                    testJavaFile.getImportList().add(importStatement);
+                }
+            }
+        }
+    }
+
+    private void getOrCreateTestClass(String testClassQName) {
         VirtualFileManager manager = VirtualFileManager.getInstance();
-        String outputFilePath = project.getBasePath() + "/" + dirPath + "/" + testClassName + ".java";
+        String outputFilePath = project.getBasePath() + "/" + dirPath + "/" + testClassQName.replaceAll("\\.", "/") + ".java";
         String url = VfsUtil.pathToUrl(outputFilePath);
 
         VirtualFile virtualFile = manager.refreshAndFindFileByUrl(url);
 
         if (virtualFile != null && virtualFile.exists()) {
-            testClz = Util.getClassByQName(project, packageName + "." + testClassName);
+            testClz = Util.getClassByQName(project, testClassQName);
             testJavaFile = (PsiJavaFile) testClz.getContainingFile();
         } else {
             File file = new File(outputFilePath);
             if (!file.getParentFile().exists()) {
                 file.getParentFile().mkdir();
             }
+            String packageName = testClassQName.substring(0, testClassQName.lastIndexOf("."));
             try (FileWriter fileWriter = new FileWriter(file)) {
                 HashMap<String, Object> map = Maps.newHashMap();
                 map.put("packageName", packageName);
-                map.put("testClassName", testClassName);
+                map.put("testClassName", testClassQName.substring(testClassQName.lastIndexOf(".")+1));
                 String classTemplate = settings.getTemplate("Class");
                 String content = VelocityUtil.evaluate(classTemplate, map);
                 fileWriter.write(content);
@@ -183,13 +223,13 @@ class UnitToolService {
 
             manager.refreshAndFindFileByUrl(url);
 
-            testClz = Util.getClassByQName(project, packageName + "." + testClassName);
+            testClz = Util.getClassByQName(project, testClassQName);
             testJavaFile = (PsiJavaFile) testClz.getContainingFile();
 
             /*testClz = JavaDirectoryService.getInstance().createClass(
                     dir, clazzName, "Class", true, Maps.newHashMap());*/
 
-            testJavaFile.setPackageName(packageName);
+            // testJavaFile.setPackageName(packageName);
         }
     }
 
@@ -262,6 +302,9 @@ class UnitToolService {
                 break;
             case "java.lang.Long":
                 entry.setValue("1L");
+                break;
+            case "java.lang.Integer":
+                entry.setValue("1");
                 break;
             default:
                 if (fieldQualifiedName.startsWith("java.util.List")) {
