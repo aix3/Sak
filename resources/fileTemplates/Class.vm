@@ -9,6 +9,7 @@ import org.junit.Test;
 
 public class ${testClassName} extends BaseLoginAuthTestCase {
 
+    // -------------------------------------
     private String userIdentifier = "9201000";
     private String plainTextPwd = "123456";
 

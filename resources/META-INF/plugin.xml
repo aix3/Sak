@@ -27,20 +27,22 @@
 
   <extensions defaultExtensionNs="com.intellij">
     <!-- Add your extensions here -->
-      <applicationService serviceInterface="com.everhomes.sak.config.IdeaToolsSetting"
-                          serviceImplementation="com.everhomes.sak.config.IdeaToolsSetting"/>
+      <applicationService serviceInterface="com.everhomes.sak.config.SakToolSettings"
+                          serviceImplementation="com.everhomes.sak.config.SakToolSettings"/>
   </extensions>
 
   <actions>
     <!-- Add your actions here -->
-      <action id="ideaplugin.GenUnit" class="com.everhomes.sak.unittool.UnitToolAction" text="GenUnit">
+      <action id="sak.GenUnit" class="com.everhomes.sak.unittool.UnitToolAction" text="Generate Test">
           <add-to-group group-id="EditorPopupMenu" anchor="last"/>
+          <keyboard-shortcut keymap="$default" first-keystroke="shift ctrl G" />
       </action>
-      <action id="ideaplugin.DocComment" class="com.everhomes.sak.doccomment.DocCommentAction" text="DocComment">
+      <action id="sak.DocComment" class="com.everhomes.sak.doccomment.DocCommentAction" text="Doc Comment">
           <add-to-group group-id="GenerateGroup" anchor="last"/>
       </action>
-      <action id="ideaplugin.CopyAPI" class="com.everhomes.sak.restapi.RestAPIAction" text="CopyAPI">
+      <action id="sak.CopyAPI" class="com.everhomes.sak.restapi.RestAPIAction" text="Copy API">
           <add-to-group group-id="EditorPopupMenu" anchor="last"/>
+          <keyboard-shortcut keymap="$default" first-keystroke="shift ctrl D" />
       </action>
   </actions>
 

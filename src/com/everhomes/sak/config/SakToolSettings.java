@@ -14,15 +14,14 @@ import java.util.Map;
 /**
  * Created by xq.tian on 2017/5/22.
  */
-@State(name = "IdeaToolsSetting", storages = {@Storage(id = "app-default", file = "$APP_CONFIG$/IdeaTools-settings.xml")})
-public class IdeaToolsSetting implements PersistentStateComponent<IdeaToolsSetting> {
+@State(name = "SakToolSettings", storages = {@Storage(id = "app-default", file = "$APP_CONFIG$/SakTool-settings.xml")})
+public class SakToolSettings implements PersistentStateComponent<SakToolSettings> {
 
-    private static final Logger LOGGER = Logger.getInstance(IdeaToolsSetting.class);
+    private static final Logger LOGGER = Logger.getInstance(SakToolSettings.class);
 
     private Map<String, String> codeTemplates;
 
-    public IdeaToolsSetting() {
-    }
+    public SakToolSettings() { }
 
     public Map<String, String> getCodeTemplates() {
         if (codeTemplates == null) {
@@ -33,7 +32,7 @@ public class IdeaToolsSetting implements PersistentStateComponent<IdeaToolsSetti
 
     @Nullable
     @Override
-    public IdeaToolsSetting getState() {
+    public SakToolSettings getState() {
         if (this.codeTemplates == null) {
             loadDefaultSettings();
         }
@@ -42,11 +41,11 @@ public class IdeaToolsSetting implements PersistentStateComponent<IdeaToolsSetti
 
     private void loadDefaultSettings() {
         try {
-            String classVm = FileUtil.loadTextAndClose(IdeaToolsSetting.class.getResourceAsStream("/template/Class.vm"));
-            String methodVm = FileUtil.loadTextAndClose(IdeaToolsSetting.class.getResourceAsStream("/template/Method.vm"));
-            String constVm = FileUtil.loadTextAndClose(IdeaToolsSetting.class.getResourceAsStream("/template/Const.vm"));
-            String restDocCommentVm = FileUtil.loadTextAndClose(IdeaToolsSetting.class.getResourceAsStream("/template/DocComment.vm"));
-            String restAPIVm = FileUtil.loadTextAndClose(IdeaToolsSetting.class.getResourceAsStream("/template/RestAPI.vm"));
+            String classVm = FileUtil.loadTextAndClose(SakToolSettings.class.getResourceAsStream("/fileTemplates/Class.vm"));
+            String methodVm = FileUtil.loadTextAndClose(SakToolSettings.class.getResourceAsStream("/fileTemplates/Method.vm"));
+            String constVm = FileUtil.loadTextAndClose(SakToolSettings.class.getResourceAsStream("/fileTemplates/Const.vm"));
+            String restDocCommentVm = FileUtil.loadTextAndClose(SakToolSettings.class.getResourceAsStream("/fileTemplates/DocComment.vm"));
+            String restAPIVm = FileUtil.loadTextAndClose(SakToolSettings.class.getResourceAsStream("/fileTemplates/RestAPI.vm"));
             Map<String, String> codeTemplates = new HashMap<>();
             codeTemplates.put("Class", classVm);
             codeTemplates.put("Method", methodVm);
@@ -60,8 +59,8 @@ public class IdeaToolsSetting implements PersistentStateComponent<IdeaToolsSetti
     }
 
     @Override
-    public void loadState(IdeaToolsSetting ideaToolsSetting) {
-        XmlSerializerUtil.copyBean(ideaToolsSetting, this);
+    public void loadState(SakToolSettings sakToolSettings) {
+        XmlSerializerUtil.copyBean(sakToolSettings, this);
     }
 
     public String getTemplate(String key) {

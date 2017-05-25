@@ -1,6 +1,6 @@
 package com.everhomes.sak.restapi;
 
-import com.everhomes.sak.config.IdeaToolsSetting;
+import com.everhomes.sak.config.SakToolSettings;
 import com.everhomes.sak.restapi.bean.RestAPIEntry;
 import com.everhomes.sak.util.Util;
 import com.everhomes.sak.util.VelocityUtil;
@@ -35,9 +35,9 @@ class RestAPIService {
     private static final String REQUEST_MAPPING_ANNO = "@RequestMapping";
     private Project project;
     private PsiMethod currMethod;
-    private IdeaToolsSetting settings;
+    private SakToolSettings settings;
 
-    static String genRestAPI(PsiClass psiClass, PsiElement element, IdeaToolsSetting settings) {
+    static String genRestAPI(PsiClass psiClass, PsiElement element, SakToolSettings settings) {
         RestAPIService service = RestAPIService.getInstance();
         service.settings = settings;
         service.project = psiClass.getProject();
@@ -47,7 +47,7 @@ class RestAPIService {
     private String genRestAPI(PsiClass psiClass, PsiElement element) {
         String qualifiedName = psiClass.getQualifiedName();
         if (qualifiedName == null) {
-            return "Not find psiClass qualifiedName";
+            return "Can not find psiClass qualifiedName";
         }
 
         if (!qualifiedName.endsWith("Controller")) {
@@ -57,7 +57,7 @@ class RestAPIService {
         String clzBody = psiClass.getText();
         String clzRequestMapping = this.getRequestMapping(clzBody);
 
-        currMethod = this.getCurrentMethod(psiClass, element);
+        currMethod = this.getCurrentMethod(element);
 
         if (currMethod == null) {
             return "Please in controller method";
@@ -78,8 +78,8 @@ class RestAPIService {
         List<RestAPIEntry> respEntryList = this.getRespEntries(apiEntry.getRespQName());
 
         Map<String, Object> templateMap = Maps.newHashMap();
-        apiEntry.setCmdQName("参数："+apiEntry.getCmdQName());
-        apiEntry.setRespQName("返回值："+apiEntry.getRespQName());
+        apiEntry.setCmdQName("参数：" + apiEntry.getCmdQName());
+        apiEntry.setRespQName("返回值：" + apiEntry.getRespQName());
         templateMap.put("apiEntry", apiEntry);
         templateMap.put("cmdEntries", cmdEntryList);
         templateMap.put("respEntries", respEntryList);
@@ -90,11 +90,14 @@ class RestAPIService {
 
         CopyPasteManager.getInstance().setContents(new TextTransferable(content));
 
-        Util.setStatusBarText(project, "API has been copied in clipboard");
+        Util.setStatusBarText(project, "The API has been copied to the clipboard");
         return "OK";
     }
 
     private List<RestAPIEntry> getRespEntries(String respQName) {
+        if ("OK".equals(respQName)) {
+            return Lists.newArrayList();
+        }
         PsiClass aClass = Util.getClassByQName(project, respQName);
         if (aClass != null) {
             Map<String, String> commentMap = getDocCommentMap(aClass);
@@ -119,19 +122,18 @@ class RestAPIService {
         List<String> cmdList = getCmdList(currMethod);
         if (cmdList.size() > 0) {
             entry.setCmdQName(cmdList.get(0));
+        } else {
+            entry.setCmdQName("无");
         }
-        PsiAnnotation[] annotations = currMethod.getModifierList().getAnnotations();
-        for (PsiAnnotation annotation : annotations) {
-            if ("com.everhomes.discover.RestReturn".equals(annotation.getQualifiedName())) {
-                PsiAnnotationMemberValue value = annotation.findAttributeValue("value");
-                PsiAnnotationMemberValue collection = annotation.findAttributeValue("collection");
-                String respQName = ((PsiTypeElementImpl) value.getFirstChild()).getType().getCanonicalText();
-                String collectionFlag = collection.getText();
-                entry.setRespQName(respQName);
-                if (collectionFlag != null) {
-                    entry.setRespCollectionFlag(Boolean.valueOf(collectionFlag));
-                }
-                break;
+        PsiAnnotation annotation = currMethod.getModifierList().findAnnotation("com.everhomes.discover.RestReturn");
+        if (annotation != null) {
+            PsiAnnotationMemberValue value = annotation.findAttributeValue("value");
+            PsiAnnotationMemberValue collection = annotation.findAttributeValue("collection");
+            String respQName = ((PsiTypeElementImpl) value.getFirstChild()).getType().getCanonicalText();
+            String collectionFlag = collection.getText();
+            entry.setRespQName(respQName.equals("java.lang.String") ? "OK" : respQName);
+            if (collectionFlag != null) {
+                entry.setRespCollectionFlag(Boolean.valueOf(collectionFlag));
             }
         }
         return entry;
@@ -194,7 +196,7 @@ class RestAPIService {
                     String group = matcher.group(1);
                     if (group.startsWith("com.everhomes.rest")) {
                         if (!fieldDesc.contains("@link")) {
-                            fieldDesc += String.format("%s {@link %s}", field.getName(), group);
+                            fieldDesc = String.format("%s {@link %s}", fieldDesc, group);
                         }
                         entry.setLink(true);
                         PsiClass fieldClass = Util.getClassByQName(project, group);
@@ -239,16 +241,15 @@ class RestAPIService {
     }
 
     @Nullable
-    private PsiMethod getCurrentMethod(PsiClass psiClass, PsiElement element) {
-        PsiMethod currentMethod = null;
-        PsiMethod[] allMethods = psiClass.getAllMethods();
-        for (PsiMethod method : allMethods) {
-            if (method.getName().equals(element.getText())) {
-                currentMethod = method;
-                break;
+    private PsiMethod getCurrentMethod(PsiElement element) {
+        do {
+            if (element instanceof PsiMethod) {
+                return ((PsiMethod) element);
             }
-        }
-        return currentMethod;
+            element = element.getParent();
+        } while (element != null);
+        // ...
+        return null;
     }
 
     private String getRequestMapping(String methodBody) {

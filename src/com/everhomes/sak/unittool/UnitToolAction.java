@@ -1,42 +1,37 @@
 package com.everhomes.sak.unittool;
 
-import com.everhomes.sak.config.IdeaToolsSetting;
+import com.everhomes.sak.config.SakToolSettings;
 import com.everhomes.sak.util.PsiUtil;
-import com.intellij.ide.IdeView;
-import com.intellij.ide.util.DirectoryChooserUtil;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.project.DumbAware;
-import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.psi.PsiClass;
-import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiElement;
-import com.intellij.psi.impl.file.PsiDirectoryFactory;
 
 /**
  * Created by xq.tian on 2017/5/18.
  */
 public class UnitToolAction extends AnAction implements DumbAware {
 
-    private IdeaToolsSetting settings;
+    private SakToolSettings settings;
 
     public UnitToolAction() {
-        this.settings = ServiceManager.getService(IdeaToolsSetting.class);
+        this.settings = ServiceManager.getService(SakToolSettings.class);
     }
 
     @Override
     public void actionPerformed(AnActionEvent e) {
         PsiClass psiClass = PsiUtil.getPsiClass(e);
         if (psiClass == null) {
-            errDialog("Do not find class");
+            errDialog("Can not find a class");
             return;
         }
 
         PsiElement element = PsiUtil.getCurrentElement(e);
         if (element == null) {
-            errDialog("Do not find element");
+            errDialog("Can not find a element");
             return;
         }
 
@@ -50,11 +45,11 @@ public class UnitToolAction extends AnAction implements DumbAware {
         Messages.showMessageDialog(
                 message,
                 "Error",
-                Messages.getInformationIcon()
+                Messages.getErrorIcon()
         );
     }
 
-    @Override
+    /*@Override
     public void update(AnActionEvent event) {
         // 在Action显示之前，先判定是否显示此Action
         // 只有当焦点为 package 或者 class 时，显示此Action
@@ -69,5 +64,5 @@ public class UnitToolAction extends AnAction implements DumbAware {
         }
         this.getTemplatePresentation().setVisible(isPackage);
         this.getTemplatePresentation().setEnabled(isPackage);
-    }
+    }*/
 }

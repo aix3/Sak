@@ -1,6 +1,6 @@
 package com.everhomes.sak.doccomment;
 
-import com.everhomes.sak.config.IdeaToolsSetting;
+import com.everhomes.sak.config.SakToolSettings;
 import com.everhomes.sak.util.PsiUtil;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
@@ -13,17 +13,17 @@ import com.intellij.psi.PsiClass;
  */
 public class DocCommentAction extends AnAction {
 
-    private IdeaToolsSetting settings;
+    private SakToolSettings settings;
 
     public DocCommentAction() {
-        this.settings = ServiceManager.getService(IdeaToolsSetting.class);
+        this.settings = ServiceManager.getService(SakToolSettings.class);
     }
 
     @Override
     public void actionPerformed(AnActionEvent e) {
         PsiClass psiClass = PsiUtil.getPsiClass(e);
         if (psiClass == null) {
-            errDialog("Do not find class");
+            errDialog("Can not find a class");
             return;
         }
 
@@ -37,7 +37,7 @@ public class DocCommentAction extends AnAction {
         Messages.showMessageDialog(
                 message,
                 "Error",
-                Messages.getInformationIcon()
+                Messages.getErrorIcon()
         );
     }
 }

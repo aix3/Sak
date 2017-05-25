@@ -1,0 +1,37 @@
+## HTML模板
+#*
+<h3>${apiEntry.apiDesc}  ${apiEntry.api}</h3>
+<div>
+    <span>$apiEntry.cmdQName</span>
+    <ul>
+       $render.evaluateHtml($cmdEntries)
+    </ul>
+</div>
+<div>
+    <span>$apiEntry.respQName</span>
+    <ul>
+        $render.evaluate($respEntries)
+    </ul>
+</div>
+*#
+## Redmine模板
+#*
+* ${apiEntry.apiDesc} URL: ${apiEntry.api}
+** $apiEntry.cmdQName
+$render.evaluateRedmine($cmdEntries)
+** $apiEntry.respQName
+$render.evaluateRedmine($respEntries)
+*#
+## Markdown模板
+<h3>${apiEntry.apiDesc} URL: ${apiEntry.api}</h3>
+$apiEntry.cmdQName
+#if ($cmdEntries.size() > 0)
+
+$render.evaluateMarkdown($cmdEntries)
+
+#end
+$apiEntry.respQName
+#if ($respEntries.size() > 0)
+
+$render.evaluateMarkdown($respEntries)
+#end

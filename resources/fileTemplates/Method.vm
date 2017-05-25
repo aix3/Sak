@@ -1,13 +1,13 @@
 #macro (cap $strIn)$strIn.valueOf($strIn.charAt(0)).toUpperCase()$strIn.substring(1)#end
 #set($capMethodName = "#cap(${methodName})")
 #set($cmdFlag = ($setterBlock.size() > 0))
-#set($responseType = "#if ($responseString)RestResponseBase #else ${capMethodName}RestResponse #end")
 // $testComment
 @Test public void test#cap($methodName) () {
     #if ($cmdFlag)
-    ${capMethodName}Command cmd = new ${capMethodName}Command();
+    ${cmdName} cmd = new ${cmdName}();
     $render.evaluate(${setterBlock})
     #end
+
     $responseType response = httpClientService.restPost($requestUriName, #if ($cmdFlag)cmd#else null#end, ${responseType}.class);
     assertNotNull(response);
     assertTrue("response = " + StringHelper.toJsonString(response), httpClientService.isReponseSuccess(response));

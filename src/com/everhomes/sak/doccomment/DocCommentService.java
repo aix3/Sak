@@ -1,6 +1,6 @@
 package com.everhomes.sak.doccomment;
 
-import com.everhomes.sak.config.IdeaToolsSetting;
+import com.everhomes.sak.config.SakToolSettings;
 import com.everhomes.sak.doccomment.bean.FieldEntry;
 import com.everhomes.sak.util.Util;
 import com.everhomes.sak.util.VelocityUtil;
@@ -9,6 +9,8 @@ import com.google.common.collect.Maps;
 import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.editor.ScrollType;
+import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.*;
 import com.intellij.psi.codeStyle.CodeStyleManager;
@@ -29,12 +31,12 @@ class DocCommentService {
 
     private static final Logger log = Util.getLogger(DocCommentService.class);
 
-    private static final String JAVA_UTIL_LIST_REGEX = "java\\.util\\.List<(.*?)>";
+    // private static final String JAVA_UTIL_LIST_REGEX = "java\\.util\\.List<(.*?)>";
 
     private Project project;
-    private IdeaToolsSetting settings;
+    private SakToolSettings settings;
 
-    static String genRestDocComment(PsiClass psiClass, IdeaToolsSetting settings) {
+    static String genRestDocComment(PsiClass psiClass, SakToolSettings settings) {
         DocCommentService service = DocCommentService.getInstance();
         service.settings = settings;
         if (psiClass != null) {
@@ -80,6 +82,13 @@ class DocCommentService {
             psiClass.getNode().addChild(newDocComment.getNode(), psiClass.getFirstChild().getNode());
             CodeStyleManager.getInstance(project).reformat(psiClass);
             // reformatJavaDoc(psiClass);
+
+            Editor editor = FileEditorManager.getInstance(project).getSelectedTextEditor();
+            if (editor != null) {
+                int offset = psiClass.getDocComment().getTextOffset();
+                editor.getScrollingModel().scrollTo(editor.offsetToLogicalPosition(offset), ScrollType.CENTER);
+                editor.getCaretModel().moveToLogicalPosition(editor.offsetToLogicalPosition(offset));
+            }
         });
         return "OK";
     }
@@ -113,6 +122,9 @@ class DocCommentService {
                             desc = desc.trim() + String.format(" {@link %s}", itemTypeQName);
                         }
                     }
+                }
+                if (fieldQualifiedName.startsWith("com.everhomes.rest") && !desc.contains("@link")) {
+                    desc = desc.trim() + String.format(" {@link %s}", fieldQualifiedName);
                 }
                 entry.setDesc(desc.trim());
             } else {

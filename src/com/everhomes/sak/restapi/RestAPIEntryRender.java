@@ -10,51 +10,86 @@ import java.util.List;
  */
 public class RestAPIEntryRender {
 
-    public String evaluate(List<RestAPIEntry> entries) {
+    public String evaluateHtml(List<RestAPIEntry> entries) {
         StringBuilder sb = new StringBuilder(1000);
         for (RestAPIEntry entry : entries) {
-            evaluate(entry, sb);
+            evaluateHtml(entry, sb);
         }
         return sb.toString();
     }
 
-    private void evaluate(RestAPIEntry entry, StringBuilder sb) {
+    private void evaluateHtml(RestAPIEntry entry, StringBuilder sb) {
         sb.append("<li>").append(entry.getFieldName()).append(": ").append(entry.getFieldDesc()).append("</li>").append("\r\n");
         if (entry.isLink()) {
             sb.append("<ul>");
             for (RestAPIEntry e : entry.getLinkTo()) {
-                evaluate(e, sb);
+                evaluateHtml(e, sb);
             }
             sb.append("</ul>");
         }
     }
 
-    public String evaluateMkd(List<RestAPIEntry> entries) {
+    public String evaluateMarkdown(List<RestAPIEntry> entries) {
         StringBuilder sb = new StringBuilder(1000);
         for (RestAPIEntry entry : entries) {
-            evaluateMkd(entry, sb, 1);
+            evaluateMarkdown(entry, sb, 1);
+        }
+        if (sb.length() > 2) {
+            return sb.substring(0, sb.length() - 2);
         }
         return sb.toString();
     }
 
-    private void evaluateMkd(RestAPIEntry entry, StringBuilder sb, int prefixCount) {
-        String prefix = getPrefix(prefixCount);
-        sb.append(prefix).append(entry.getFieldName()).append(": ").append(entry.getFieldDesc()).append("<br>");
+    private void evaluateMarkdown(RestAPIEntry entry, StringBuilder sb, int prefixCount) {
+        String prefix = getMarkdownPrefix(prefixCount);
+        sb.append(prefix).append(entry.getFieldName()).append(": ").append(entry.getFieldDesc()).append("\r\n");
         if (entry.isLink()) {
             prefixCount++;
             for (RestAPIEntry e : entry.getLinkTo()) {
-                evaluateMkd(e, sb, prefixCount);
+                evaluateMarkdown(e, sb, prefixCount);
+            }
+        }
+    }
+
+    public String evaluateRedmine(List<RestAPIEntry> entries) {
+        StringBuilder sb = new StringBuilder(1000);
+        for (RestAPIEntry entry : entries) {
+            evaluateRedmine(entry, sb, 1);
+        }
+        if (sb.length() > 2) {
+            return sb.substring(0, sb.length() - 2);
+        }
+        return sb.toString();
+    }
+
+    private void evaluateRedmine(RestAPIEntry entry, StringBuilder sb, int prefixCount) {
+        String prefix = getRedminePrefix(prefixCount);
+        sb.append(prefix).append(entry.getFieldName()).append(": ").append(entry.getFieldDesc()).append("\r\n");
+        if (entry.isLink()) {
+            prefixCount++;
+            for (RestAPIEntry e : entry.getLinkTo()) {
+                evaluateRedmine(e, sb, prefixCount);
             }
         }
     }
 
     @NotNull
-    private String getPrefix(int prfixCount) {
+    private String getMarkdownPrefix(int prefixCount) {
         String prefix = "";
-        for (int i = 1; i < prfixCount; i++) {
-            prefix += "&nbsp;&nbsp;";
+        for (int i = 1; i < prefixCount; i++) {
+            prefix += "\t";
         }
-        prefix += "* ";
+        prefix += "- ";
+        return prefix;
+    }
+
+    @NotNull
+    private String getRedminePrefix(int prefixCount) {
+        String prefix = "";
+        for (int i = 1; i < prefixCount; i++) {
+            prefix += "*";
+        }
+        prefix += "*** ";
         return prefix;
     }
 }

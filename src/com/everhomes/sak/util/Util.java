@@ -11,7 +11,11 @@ import com.intellij.psi.*;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.search.GlobalSearchScopeUtil;
 import com.intellij.psi.search.ProjectAndLibrariesScope;
+import com.intellij.psi.util.CreateClassUtil;
 import com.intellij.psi.util.PsiTreeUtil;
+import com.intellij.util.IncorrectOperationException;
+import com.intellij.util.text.StringTokenizer;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -93,6 +97,38 @@ public class Util {
                 statusBar.setInfo(message);
             }
         }
+    }
+
+    /*public static void tooltip(Project project, String message) {
+        if (project != null) {
+            JToolTip jToolTip = new JToolTip();
+            jToolTip.setTipText("sdasdsadsadsadsa");
+            TooltipWithClickableLinks tooltip = new TooltipWithClickableLinks(jToolTip, "<h3>sda</h3>", new HyperlinkListener() {
+                @Override
+                public void hyperlinkUpdate(HyperlinkEvent e) {
+                    System.out.println(e);
+                }
+            });
+            tooltip.setToCenter(true);
+        }
+    }*/
+
+    public static PsiDirectory createParentDirectories(@NotNull PsiDirectory directoryRoot, @NotNull String className) throws IncorrectOperationException {
+        final PsiPackage currentPackage = JavaDirectoryService.getInstance().getPackage(directoryRoot);
+        final String packagePrefix = currentPackage == null ? null : currentPackage.getQualifiedName() + ".";
+        final String packageName = CreateClassUtil.extractPackage(packagePrefix != null && className.startsWith(packagePrefix)?
+                className.substring(packagePrefix.length()) : className);
+        final StringTokenizer tokenizer = new StringTokenizer(packageName, ".");
+        while (tokenizer.hasMoreTokens()) {
+            String packagePart = tokenizer.nextToken();
+            PsiDirectory subdirectory = directoryRoot.findSubdirectory(packagePart);
+            if (subdirectory == null) {
+                directoryRoot.checkCreateSubdirectory(packagePart);
+                subdirectory = directoryRoot.createSubdirectory(packagePart);
+            }
+            directoryRoot = subdirectory;
+        }
+        return directoryRoot;
     }
 
     public static boolean isNumeric(String str) {
