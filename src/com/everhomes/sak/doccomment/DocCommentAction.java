@@ -1,22 +1,21 @@
-package com.everhomes.ideaplugin.restapi;
+package com.everhomes.sak.doccomment;
 
-import com.everhomes.ideaplugin.config.IdeaToolsSetting;
-import com.everhomes.ideaplugin.util.PsiUtil;
+import com.everhomes.sak.config.IdeaToolsSetting;
+import com.everhomes.sak.util.PsiUtil;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.psi.PsiClass;
-import com.intellij.psi.PsiElement;
 
 /**
- * Created by xq.tian on 2017/5/24.
+ * Created by xq.tian on 2017/5/23.
  */
-public class RestAPIAction extends AnAction {
+public class DocCommentAction extends AnAction {
 
     private IdeaToolsSetting settings;
 
-    public RestAPIAction() {
+    public DocCommentAction() {
         this.settings = ServiceManager.getService(IdeaToolsSetting.class);
     }
 
@@ -28,13 +27,7 @@ public class RestAPIAction extends AnAction {
             return;
         }
 
-        PsiElement element = PsiUtil.getCurrentElement(e);
-        if (element == null) {
-            errDialog("Do not find element");
-            return;
-        }
-
-        String result = RestAPIService.genRestAPI(psiClass, element, settings);
+        String result = DocCommentService.genRestDocComment(psiClass, settings);
         if (!"OK".equals(result)) {
             errDialog(result);
         }

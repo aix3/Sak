@@ -1,4 +1,4 @@
-package com.everhomes.ideaplugin.util;
+package com.everhomes.sak.util;
 
 import com.intellij.ide.IdeView;
 import com.intellij.ide.util.*;

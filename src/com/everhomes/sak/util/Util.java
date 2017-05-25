@@ -1,4 +1,4 @@
-package com.everhomes.ideaplugin.util;
+package com.everhomes.sak.util;
 
 import com.google.common.collect.Lists;
 import com.intellij.ide.util.TreeClassChooser;

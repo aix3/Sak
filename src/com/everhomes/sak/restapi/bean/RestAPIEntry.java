@@ -1,4 +1,4 @@
-package com.everhomes.ideaplugin.restapi.bean;
+package com.everhomes.sak.restapi.bean;
 
 import com.google.common.collect.Lists;
 import org.apache.commons.lang.builder.ToStringBuilder;

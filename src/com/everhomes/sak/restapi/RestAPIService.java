@@ -1,9 +1,9 @@
-package com.everhomes.ideaplugin.restapi;
+package com.everhomes.sak.restapi;
 
-import com.everhomes.ideaplugin.config.IdeaToolsSetting;
-import com.everhomes.ideaplugin.restapi.bean.RestAPIEntry;
-import com.everhomes.ideaplugin.util.Util;
-import com.everhomes.ideaplugin.util.VelocityUtil;
+import com.everhomes.sak.config.IdeaToolsSetting;
+import com.everhomes.sak.restapi.bean.RestAPIEntry;
+import com.everhomes.sak.util.Util;
+import com.everhomes.sak.util.VelocityUtil;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.intellij.openapi.diagnostic.Logger;

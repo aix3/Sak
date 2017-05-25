@@ -1,7 +1,7 @@
-package com.everhomes.ideaplugin.unittool;
+package com.everhomes.sak.unittool;
 
-import com.everhomes.ideaplugin.unittool.bean.CmdEntry;
-import com.everhomes.ideaplugin.util.Util;
+import com.everhomes.sak.unittool.bean.CmdEntry;
+import com.everhomes.sak.util.Util;
 
 import java.util.List;
 

@@ -1,19 +1,18 @@
 <idea-plugin version="2">
-  <id>com.your.company.unique.plugin.id</id>
-  <name>Plugin display name here</name>
-  <version>1.0</version>
-  <vendor email="support@yourcompany.com" url="http://www.yourcompany.com">YourCompany</vendor>
+  <id>com.everhomes.sak</id>
+  <name>Sak</name>
+  <version>0.0.3-beta</version>
+  <vendor email="xq.tian@zuolin.com" url="http://www.zuolin.com">ZL</vendor>
 
   <description><![CDATA[
-      Enter short description for your plugin here.<br>
-      <em>most HTML tags may be used</em>
+      sak (Swiss Army knife)<br>
+      Make your code more efficient, enjoy.
     ]]></description>
 
-  <idea-version since-build="162" until-build="162.*"/>
+  <!--<idea-version since-build="162" until-build="162.*"/>-->
 
   <change-notes><![CDATA[
-      Add change notes here.<br>
-      <em>most HTML tags may be used</em>
+      2017-05-25: It is beta version, just call him 0.0.3-beta<br>
     ]]>
   </change-notes>
 
@@ -28,19 +27,19 @@
 
   <extensions defaultExtensionNs="com.intellij">
     <!-- Add your extensions here -->
-      <applicationService serviceInterface="com.everhomes.ideaplugin.config.IdeaToolsSetting"
-                          serviceImplementation="com.everhomes.ideaplugin.config.IdeaToolsSetting"/>
+      <applicationService serviceInterface="com.everhomes.sak.config.IdeaToolsSetting"
+                          serviceImplementation="com.everhomes.sak.config.IdeaToolsSetting"/>
   </extensions>
 
   <actions>
     <!-- Add your actions here -->
-      <action id="ideaplugin.GenUnit" class="com.everhomes.ideaplugin.unittool.UnitToolAction" text="GenUnit">
+      <action id="ideaplugin.GenUnit" class="com.everhomes.sak.unittool.UnitToolAction" text="GenUnit">
           <add-to-group group-id="EditorPopupMenu" anchor="last"/>
       </action>
-      <action id="ideaplugin.DocComment" class="com.everhomes.ideaplugin.doccomment.DocCommentAction" text="DocComment">
+      <action id="ideaplugin.DocComment" class="com.everhomes.sak.doccomment.DocCommentAction" text="DocComment">
           <add-to-group group-id="GenerateGroup" anchor="last"/>
       </action>
-      <action id="ideaplugin.CopyAPI" class="com.everhomes.ideaplugin.restapi.RestAPIAction" text="CopyAPI">
+      <action id="ideaplugin.CopyAPI" class="com.everhomes.sak.restapi.RestAPIAction" text="CopyAPI">
           <add-to-group group-id="EditorPopupMenu" anchor="last"/>
       </action>
   </actions>

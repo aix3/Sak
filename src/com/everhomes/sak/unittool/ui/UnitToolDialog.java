@@ -1,7 +1,7 @@
-package com.everhomes.ideaplugin.unittool.ui;
+package com.everhomes.sak.unittool.ui;
 
-import com.everhomes.ideaplugin.util.PsiUtil;
-import com.everhomes.ideaplugin.util.Util;
+import com.everhomes.sak.util.PsiUtil;
+import com.everhomes.sak.util.Util;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiDirectory;

@@ -1,6 +1,6 @@
-package com.everhomes.ideaplugin.restapi;
+package com.everhomes.sak.restapi;
 
-import com.everhomes.ideaplugin.restapi.bean.RestAPIEntry;
+import com.everhomes.sak.restapi.bean.RestAPIEntry;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;

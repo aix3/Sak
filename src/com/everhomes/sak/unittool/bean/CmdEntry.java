@@ -1,4 +1,4 @@
-package com.everhomes.ideaplugin.unittool.bean;
+package com.everhomes.sak.unittool.bean;
 
 import com.google.common.collect.Lists;
 import org.apache.commons.lang.builder.ToStringBuilder;

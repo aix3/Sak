@@ -1,4 +1,4 @@
-package com.everhomes.ideaplugin.doccomment.bean;
+package com.everhomes.sak.doccomment.bean;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 

@@ -1,4 +1,4 @@
-package com.everhomes.ideaplugin.config;
+package com.everhomes.sak.config;
 
 import com.intellij.openapi.components.PersistentStateComponent;
 import com.intellij.openapi.components.State;

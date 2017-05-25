@@ -1,7 +1,7 @@
-package com.everhomes.ideaplugin.unittool;
+package com.everhomes.sak.unittool;
 
-import com.everhomes.ideaplugin.config.IdeaToolsSetting;
-import com.everhomes.ideaplugin.util.PsiUtil;
+import com.everhomes.sak.config.IdeaToolsSetting;
+import com.everhomes.sak.util.PsiUtil;
 import com.intellij.ide.IdeView;
 import com.intellij.ide.util.DirectoryChooserUtil;
 import com.intellij.openapi.actionSystem.AnAction;

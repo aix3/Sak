@@ -1,9 +1,9 @@
-package com.everhomes.ideaplugin.doccomment;
+package com.everhomes.sak.doccomment;
 
-import com.everhomes.ideaplugin.config.IdeaToolsSetting;
-import com.everhomes.ideaplugin.doccomment.bean.FieldEntry;
-import com.everhomes.ideaplugin.util.Util;
-import com.everhomes.ideaplugin.util.VelocityUtil;
+import com.everhomes.sak.config.IdeaToolsSetting;
+import com.everhomes.sak.doccomment.bean.FieldEntry;
+import com.everhomes.sak.util.Util;
+import com.everhomes.sak.util.VelocityUtil;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.intellij.openapi.command.WriteCommandAction;

@@ -1,4 +1,4 @@
-package com.everhomes.ideaplugin.util;
+package com.everhomes.sak.util;
 
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.VelocityEngine;
