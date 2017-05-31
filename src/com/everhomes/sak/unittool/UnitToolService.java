@@ -42,11 +42,12 @@ class UnitToolService {
 
     private static final Logger log = Util.getLogger(UnitToolService.class);
 
+    private int recursiveCount = 15;// 递归的最大层数，避免过深的递归
+
     // private static final String REQUEST_MAPPING_ANNO = "@RequestMapping";
-
     private static final String JAVA_UTIL_LIST_REGEX = "java\\.util\\.List<(.*?)>";
-    // private static final String REQUEST_MAPPING_REGEX = "@RequestMapping\\(\"(.*?)\"\\)";
 
+    // private static final String REQUEST_MAPPING_REGEX = "@RequestMapping\\(\"(.*?)\"\\)";
     private List<String> importList = Lists.newArrayList();
     private Project project;
     private PsiMethod currMethod;
@@ -55,14 +56,15 @@ class UnitToolService {
     private String cmdName;
     private String currClzQName;
     private PsiClass testClz;
+
     private VirtualFile vf;
-
     private String responseType;
-    private String testComment;
 
+    private String testComment;
     private PsiJavaFile testJavaFile;
     private SakToolSettings settings;
     private boolean createClassSuccess = false;
+
     private boolean testClassNotFound = false;
 
     static String genUnitTest(PsiClass psiClass, PsiElement element, SakToolSettings settings) {
@@ -365,6 +367,10 @@ class UnitToolService {
 
     private List<CmdEntry> processCmdEntries(PsiField[] allFields) {
         List<CmdEntry> entries = Lists.newArrayList();
+        recursiveCount--;
+        if (recursiveCount < 0) {
+            return entries;
+        }
         for (PsiField field : allFields) {
             CmdEntry newSetter = new CmdEntry();
             processCmdEntries(field, newSetter);

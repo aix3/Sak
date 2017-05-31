@@ -26,6 +26,8 @@ import java.util.regex.Pattern;
  */
 class RestAPIService {
 
+    private int recursiveCount = 15;// 递归的最大层数，避免过深的递归
+
     private static final Logger log = Util.getLogger(RestAPIService.class);
 
     private static final String JAVA_UTIL_LIST_REGEX = "java\\.util\\.List<(.*?)>";
@@ -166,6 +168,11 @@ class RestAPIService {
     private List<RestAPIEntry> processAPIEntries(PsiClass psiClass, Map<String, String> commentMap, boolean isEnum) {
         List<RestAPIEntry> entryList = Lists.newArrayList();
 
+        recursiveCount--;
+        if (recursiveCount < 0) {
+            return entryList;
+        }
+
         for (PsiField field : psiClass.getAllFields()) {
             if (isEnum && !field.getType().getCanonicalText().equals(psiClass.getQualifiedName())) {
                 continue;
@@ -187,7 +194,11 @@ class RestAPIService {
                 entry.setLink(true);
                 PsiClass fieldClass = Util.getClassByQName(project, fieldQualifiedName);
                 if (!isEnum) {
-                    entry.getLinkTo().addAll(processAPIEntries(fieldClass, getDocCommentMap(fieldClass), fieldClass.isEnum()));
+                    boolean selfRef = false;
+                    if (fieldClass.isEnum() || fieldQualifiedName.equals(psiClass.getQualifiedName())) {
+                        selfRef = true;
+                    }
+                    entry.getLinkTo().addAll(processAPIEntries(fieldClass, getDocCommentMap(fieldClass), selfRef));
                 }
             } else if (fieldQualifiedName.startsWith("java.util.List")) {
                 Pattern compile = Pattern.compile(JAVA_UTIL_LIST_REGEX);
@@ -200,7 +211,11 @@ class RestAPIService {
                         }
                         entry.setLink(true);
                         PsiClass fieldClass = Util.getClassByQName(project, group);
-                        entry.getLinkTo().addAll(processAPIEntries(fieldClass, getDocCommentMap(fieldClass), fieldClass.isEnum()));
+                        boolean selfRef = false;
+                        if (fieldClass.isEnum() || group.equals(psiClass.getQualifiedName())) {
+                            selfRef = true;
+                        }
+                        entry.getLinkTo().addAll(processAPIEntries(fieldClass, getDocCommentMap(fieldClass), selfRef));
                     }
                 }
             } else if (fieldDesc != null && fieldDesc.contains("@link")) {
@@ -210,7 +225,12 @@ class RestAPIService {
                     String linkTo = matcher.group(1);
                     PsiClass linkToClass = Util.getClassByQName(project, linkTo);
                     if (linkToClass != null) {
-                        entry.getLinkTo().addAll(processAPIEntries(linkToClass, getDocCommentMap(linkToClass), linkToClass.isEnum()));
+                        boolean selfRef = false;
+                        if (linkToClass.isEnum() || linkTo.equals(psiClass.getQualifiedName())) {
+                            selfRef = true;
+                        }
+
+                        entry.getLinkTo().addAll(processAPIEntries(linkToClass, getDocCommentMap(linkToClass), selfRef));
                         entry.setLink(true);
                     }
                 }
