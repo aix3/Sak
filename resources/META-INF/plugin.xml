@@ -44,6 +44,9 @@
           <add-to-group group-id="EditorPopupMenu" anchor="last"/>
           <keyboard-shortcut keymap="$default" first-keystroke="shift ctrl D" />
       </action>
+      <action id="sak.FmtOff" class="com.everhomes.sak.fmtoff.FmtOffAction" text="Formatter off">
+          <add-to-group group-id="GenerateGroup" anchor="last"/>
+      </action>
   </actions>
 
     <application-components>

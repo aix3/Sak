@@ -26,7 +26,7 @@ import java.util.regex.Pattern;
  */
 class RestAPIService {
 
-    private int recursiveCount = 15;// 递归的最大层数，避免过深的递归
+    private int recursiveCount = 50;// 递归的最大层数，避免过深的递归
 
     private static final Logger log = Util.getLogger(RestAPIService.class);
 

@@ -42,7 +42,7 @@ class UnitToolService {
 
     private static final Logger log = Util.getLogger(UnitToolService.class);
 
-    private int recursiveCount = 15;// 递归的最大层数，避免过深的递归
+    private int recursiveCount = 50;// 递归的最大层数，避免过深的递归
 
     // private static final String REQUEST_MAPPING_ANNO = "@RequestMapping";
     private static final String JAVA_UTIL_LIST_REGEX = "java\\.util\\.List<(.*?)>";
@@ -331,10 +331,12 @@ class UnitToolService {
     private List<CmdEntry> getCmdEntries(List<String> cmdList) {
         List<CmdEntry> entryList = Lists.newArrayList();
         for (String cmd : cmdList) {
-            PsiClass aClass = Util.getClassByQName(project, cmd);
-            PsiField[] allFields = aClass.getAllFields();
-            List<CmdEntry> setters = processCmdEntries(allFields);
-            entryList.addAll(setters);
+            if (cmd.startsWith("com.everhomes")) {
+                PsiClass aClass = Util.getClassByQName(project, cmd);
+                PsiField[] allFields = aClass.getAllFields();
+                List<CmdEntry> setters = processCmdEntries(allFields);
+                entryList.addAll(setters);
+            }
         }
         return entryList;
     }
