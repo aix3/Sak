@@ -42,7 +42,7 @@ public class RestAPIEntryRender {
 
     private void evaluateMarkdown(RestAPIEntry entry, StringBuilder sb, int prefixCount) {
         String prefix = getMarkdownPrefix(prefixCount);
-        sb.append(prefix).append(entry.getFieldName()).append(": ").append(entry.getFieldDesc()).append("\r\n");
+        sb.append(prefix).append(entry.getFieldName()).append(": ").append(entry.getFieldDesc()).append("<br>");
         if (entry.isLink()) {
             prefixCount++;
             for (RestAPIEntry e : entry.getLinkTo()) {
